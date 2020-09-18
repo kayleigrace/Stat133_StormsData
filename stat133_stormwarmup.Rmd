@@ -1,11 +1,11 @@
 ---
-  title: "hw02-Kaylei-Nilson"
+title: "hw02-Kaylei-Nilson"
 author: "Kaylei"
 date: "9/14/2020"
 output: github_document
 ---
   
-  ```{r setup, include=FALSE}
+```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 library(dplyr)
 library(ggplot2)
