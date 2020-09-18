@@ -1,0 +1,238 @@
+---
+  title: "hw02-Kaylei-Nilson"
+author: "Kaylei"
+date: "9/14/2020"
+output: github_document
+---
+  
+  ```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(dplyr)
+library(ggplot2)
+```
+
+```{r}
+# 1(a)
+nrow(storms)
+```
+
+```{r}
+# 1(b)
+ncol(storms)
+```
+
+1(c) Tibbles are a newer version of data frames. Tibbles mainly differ from traditional data frames in printing and subsetting abilities. 
+
+1(d) These abbreviations refer to each columns type and is found through using str() which describes the structure of an object.
+
+
+```{r}
+# 2(a)
+
+specific_year <- filter(storms, year == 1980)
+nrow(specific_year)
+```
+
+```{r}
+# 2(b)
+
+unique_year <- distinct(select(specific_year, name))
+unique_year
+```
+
+```{r}
+# 2(c)
+
+arrange(unique_year, (desc(name)))
+```
+
+```{r}
+# 2(d)
+
+by_records <-  group_by(specific_year, name)
+nrecords <- count(by_records)
+arrange(nrecords, n)
+```
+
+
+```{r}
+# 3(a)
+
+decade <- filter(storms, year == 1990:1999)
+unique_decade <- distinct(select(decade, name, year))
+first_five <- head(unique_decade,5)
+last_five <- tail(unique_decade,5)
+#storm_names_1990s <- rbind(first_five, last_five)
+first_five
+last_five
+```
+
+```{r}
+# 3(b)
+
+unique_storm <- distinct(select(storms, name, year))
+by_year <-  group_by(unique_storm, year)
+storms_per_year <- count(by_year)
+head(storms_per_year, 15)
+```
+
+```{r eval=FALSE, include=FALSE}
+# other method for 3(c)
+
+storm_records <-  group_by(storms, name, year)
+nrecords <- count(storm_records)
+nrecords
+```
+
+```{r}
+# main method for 3(c)
+
+storm_records_per_year <- summarise(
+  group_by(storms, name, year),
+  number = n()
+)
+
+chron_storm_per_year <- arrange(storm_records_per_year, year)
+
+head(chron_storm_per_year, 10)
+tail(chron_storm_per_year, 10)
+
+```
+
+
+```{r}
+# 4(a)
+
+decade <- filter(storms, year == 1990:1999)
+decade_storms <- summarise(
+  group_by(decade, year),
+  number = n()
+)
+
+decade_storms
+```
+
+```{r}
+# 4(a)
+
+ggplot(data=decade_storms, aes(x=factor(year), y=number)) +
+  geom_bar(stat="identity", color= "black", fill= "#CC79A7")
+```
+
+```{r}
+# 4(b)
+
+ggplot(data=storms, aes(wind))+
+  geom_histogram(color= "black", fill="slategray3", bins=25)
+```
+
+```{r}
+# 4(c)
+
+ggplot(storms, aes(x=pressure))+
+  geom_density(color="indianred", fill="thistle2")
+```
+
+```{r}
+# 4(d)
+
+Year90to09 <- filter(storms, year %in% 1990:2009)
+
+
+ggplot(Year90to09, aes(x=pressure))+
+  facet_wrap(~year) +
+  geom_density(color= "indianred", fill="thistle2")
+```
+
+
+```{r}
+# 4(e)
+
+wind_storms <- summarise(
+  group_by (storms, year),
+  wind_avg = mean(wind)
+)
+
+ggplot (wind_storms, aes(x=year, y=wind_avg)) +
+  geom_line() + 
+  geom_point()
+
+
+```
+
+```{r}
+# 5(a)
+
+distinct_status <- distinct(storms, status)
+distinct_status
+```
+
+```{r}
+# 5(b)
+
+distinct_category <- distinct (storms, category)
+distinct_category
+```
+
+
+```{r}
+# 5(c)
+
+summarise(
+  group_by (storms, status, category)
+)
+```
+
+```{r}
+# 5(d)
+
+summarise(
+  group_by (storms,category, status),
+  avg_pressure= mean(pressure),
+  avg_wind= mean(wind),
+)
+
+
+```
+
+```{r}
+# 5(e)
+
+ggplot(storms, aes(x= status, y=pressure)) +
+  geom_boxplot(color= "black", fill= "thistle", width= 0.9)
+```
+
+
+```{r}
+# 6
+
+ggplot(storms, aes(x=wind, y=pressure)) +
+  geom_point(aes(color=category))
+```
+
+```{r}
+# 7
+
+max_wind_per_storm <- summarise(
+  group_by (storms, year, name),
+  max_wind= max(wind)
+)
+
+head(max_wind_per_storm, 10)
+tail(max_wind_per_storm,10)
+```
+
+
+```{r}
+# 8
+
+max_wind_per_year <- storms %>%
+  group_by(year) %>%
+  summarise(name=name[which.max(wind)], wind=max(wind))
+
+
+chron_max_wind <- arrange(max_wind_per_year, desc(wind))
+
+head(chron_max_wind, 10)
+tail(chron_max_wind, 10)
+```
